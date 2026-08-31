@@ -1,7 +1,13 @@
 const API_BASE_URL = "https://tg-web-app-ozk0.onrender.com";
 
 export const apiRequest = async (endpoint, options = {}) => {
-  const initData = window.Telegram?.WebApp?.initData || "";
+  const tg = window.Telegram?.WebApp;
+  
+  if (tg) {
+    tg.ready();
+  }
+
+  const initData = tg?.initData || "";
 
   const headers = {
     "Content-Type": "application/json",
@@ -24,7 +30,7 @@ export const apiRequest = async (endpoint, options = {}) => {
     return data;
   } catch (err) {
     if (err.name === "TypeError") {
-      throw new Error("Ошибка сети или CORS. Проверьте бэкенд.");
+      throw new Error("Ошибка сети или CORS.");
     }
     throw err;
   }
