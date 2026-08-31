@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { apiRequest } from "./api";
+import { User, Target, Trophy, Wallet, Zap } from 'lucide-react';
+
+// Внутри компонента App, замена кнопок навигации:
+<button style={styles.navItem}>
+  <User size={20} color={activeTab === "profile" ? "#60a5fa" : "#64748b"} />
+  <span>Профиль</span>
+</button>
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("profile"); // 'profile' | 'tasks' | 'leaderboard' | 'wallet'
