@@ -1,27 +1,31 @@
-// ЗАМЕНИТЕ НА ВАШ URL БЭКЕНДА НА RENDER
 const API_BASE_URL = "https://tg-web-app-ozk0.onrender.com";
 
-const getInitData = () => {
-  return window.Telegram?.WebApp?.initData || "";
-};
-
 export const apiRequest = async (endpoint, options = {}) => {
-  const initData = getInitData();
+  const initData = window.Telegram?.WebApp?.initData || "";
+
   const headers = {
     "Content-Type": "application/json",
     "Authorization": `Bearer ${initData}`,
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || "Ошибка сервера");
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Ошибка сервера");
+    }
+
+    return data;
+  } catch (err) {
+    if (err.name === "TypeError") {
+      throw new Error("Ошибка сети или CORS. Проверьте бэкенд.");
+    }
+    throw err;
   }
-
-  return response.json();
 };
