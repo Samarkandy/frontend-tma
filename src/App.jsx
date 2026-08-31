@@ -1,12 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { apiRequest } from "./api";
-import { User, Target, Trophy, Wallet, Zap } from 'lucide-react';
-
-// Внутри компонента App, замена кнопок навигации:
-<button style={styles.navItem}>
-  <User size={20} color={activeTab === "profile" ? "#60a5fa" : "#64748b"} />
-  <span>Профиль</span>
-</button>
+import { 
+  User, 
+  Target, 
+  Trophy, 
+  Wallet, 
+  Zap, 
+  ChevronRight, 
+  Sparkles, 
+  Copy, 
+  Check, 
+  CheckCircle2, 
+  X, 
+  ArrowUpRight,
+  ShieldCheck,
+  Coins,
+  Layers,
+  Users
+} from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("profile"); // 'profile' | 'tasks' | 'leaderboard' | 'wallet'
@@ -118,7 +129,7 @@ export default function App() {
 
   const copyRefLink = () => {
     triggerHaptic();
-    const botName = "TMA_Earning_Bot"; // Замените на username вашего бота
+    const botName = "TMA_Earning_Bot";
     const refLink = `https://t.me/${botName}?start=ref_${user?.id}`;
     navigator.clipboard.writeText(refLink);
     setCopied(true);
@@ -129,7 +140,9 @@ export default function App() {
     return (
       <div style={styles.loadingContainer}>
         <div style={styles.spinner}></div>
-        <p>Загрузка TMA Earning Hub...</p>
+        <p style={{ marginTop: 16, color: "#8e8e93", fontSize: 15, fontWeight: "500" }}>
+          Загрузка TMA Hub...
+        </p>
       </div>
     );
   }
@@ -141,19 +154,27 @@ export default function App() {
 
   return (
     <div style={styles.appContainer}>
+      
       {/* --- ЭКРАН 1: ПРОФИЛЬ --- */}
       {activeTab === "profile" && (
         <div style={styles.tabContent}>
-          <div style={styles.profileCard}>
-            <div style={styles.avatar}>👤</div>
+          
+          {/* iOS Виджет Профиля */}
+          <div style={styles.profileWidget}>
+            <div style={styles.avatarWrapper}>
+              <User size={38} color="#007AFF" />
+            </div>
             <h2 style={styles.userName}>{user?.first_name || "Пользователь"}</h2>
             <p style={styles.userHandle}>@{user?.username || "no_username"}</p>
+            
             <div style={styles.balanceBadge}>
-              <span style={styles.balanceText}>{user?.balance}</span> coins
+              <Coins size={18} color="#007AFF" style={{ marginRight: 6 }} />
+              <span style={styles.balanceText}>{user?.balance?.toLocaleString() || 0}</span>
+              <span style={styles.coinsLabel}>coins</span>
             </div>
           </div>
 
-          {/* Интерактивная сетка карточек */}
+          {/* iOS Сетка Интерактивных Виджетов */}
           <div style={styles.statsGrid}>
             <div
               style={styles.statCard}
@@ -162,9 +183,12 @@ export default function App() {
                 setActiveTab("leaderboard");
               }}
             >
-              <span style={styles.statTitle}>Рейтинг</span>
+              <div style={styles.statHeader}>
+                <Trophy size={20} color="#FFCC00" />
+                <ChevronRight size={16} color="#8e8e93" />
+              </div>
               <span style={styles.statValue}>#{user?.rank || 1}</span>
-              <span style={styles.statHint}>Перейти в лидеры →</span>
+              <span style={styles.statTitle}>Рейтинг</span>
             </div>
 
             <div
@@ -174,9 +198,12 @@ export default function App() {
                 setActiveTab("tasks");
               }}
             >
-              <span style={styles.statTitle}>Выполнено</span>
+              <div style={styles.statHeader}>
+                <CheckCircle2 size={20} color="#34C759" />
+                <ChevronRight size={16} color="#8e8e93" />
+              </div>
               <span style={styles.statValue}>{user?.tasks_completed || 0}</span>
-              <span style={styles.statHint}>Открыть задания →</span>
+              <span style={styles.statTitle}>Заданий</span>
             </div>
 
             <div
@@ -186,14 +213,29 @@ export default function App() {
                 setShowRefModal(true);
               }}
             >
-              <span style={styles.statTitle}>Рефералы</span>
+              <div style={styles.statHeader}>
+                <Users size={20} color="#AF52DE" />
+                <ChevronRight size={16} color="#8e8e93" />
+              </div>
               <span style={styles.statValue}>{user?.referrals_count || 0}</span>
-              <span style={styles.statHint}>Пригласить друзей →</span>
+              <span style={styles.statTitle}>Друзей</span>
             </div>
           </div>
 
+          {/* Кнопка PRO в стиле One UI Gradient Banner */}
           <button style={styles.proButton} onClick={handleBuyPro}>
-            ⭐ {user?.is_pro ? "PRO Активен (x2 Доход)" : "Купить PRO (x2 Доход) — 250 Stars"}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Sparkles size={22} color="#FFF" />
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontWeight: "700", fontSize: 15 }}>
+                  {user?.is_pro ? "PRO Активен" : "Активировать PRO Status"}
+                </div>
+                <div style={{ fontSize: 12, opacity: 0.8, fontWeight: "400" }}>
+                  {user?.is_pro ? "Удвоенный доход со всех заданий" : "Умножайте доход x2 — 250 Stars"}
+                </div>
+              </div>
+            </div>
+            <ArrowUpRight size={20} color="#FFF" />
           </button>
         </div>
       )}
@@ -201,49 +243,62 @@ export default function App() {
       {/* --- ЭКРАН 2: БИРЖА ЗАДАНИЙ --- */}
       {activeTab === "tasks" && (
         <div style={styles.tabContent}>
-          <h2 style={styles.pageTitle}>🎯 Биржа Заданий</h2>
+          <div style={styles.headerBlock}>
+            <h1 style={styles.pageTitle}>Биржа Заданий</h1>
+            <p style={styles.pageSubtitle}>Выполняйте простые таски и получайте coins</p>
+          </div>
 
-          {/* Категории */}
+          {/* iOS Segmented Control / Переключатель Категорий */}
           <div style={styles.categoriesRow}>
-            {["all", "ai", "copywriting", "social", "survey"].map((cat) => (
+            {[
+              { id: "all", label: "Все" },
+              { id: "ai", label: "ИИ" },
+              { id: "copywriting", label: "Тексты" },
+              { id: "social", label: "Соцсети" },
+              { id: "survey", label: "Опросы" },
+            ].map((cat) => (
               <button
-                key={cat}
+                key={cat.id}
                 style={{
                   ...styles.catChip,
-                  ...(taskCategory === cat ? styles.catChipActive : {}),
+                  ...(taskCategory === cat.id ? styles.catChipActive : {}),
                 }}
                 onClick={() => {
                   triggerHaptic();
-                  setTaskCategory(cat);
+                  setTaskCategory(cat.id);
                 }}
               >
-                {cat === "all" && "Все"}
-                {cat === "ai" && "ИИ"}
-                {cat === "copywriting" && "Тексты"}
-                {cat === "social" && "Соцсети"}
-                {cat === "survey" && "Опросы"}
+                {cat.label}
               </button>
             ))}
           </div>
 
+          {/* Список карточек заданий */}
           <div style={styles.tasksList}>
             {filteredTasks.map((t) => (
               <div
                 key={t.id}
                 style={{
                   ...styles.taskCard,
-                  opacity: t.is_completed ? 0.6 : 1,
+                  opacity: t.is_completed ? 0.55 : 1,
                 }}
                 onClick={() => setSelectedTask(t)}
               >
+                <div style={styles.taskIconBox}>
+                  <Target size={22} color={t.is_completed ? "#8e8e93" : "#007AFF"} />
+                </div>
                 <div style={styles.taskInfo}>
                   <h4 style={styles.taskTitle}>{t.title}</h4>
                   <p style={styles.taskReward}>+{t.reward} coins</p>
                 </div>
                 {t.is_completed ? (
-                  <span style={styles.completedBadge}>✓ Выполнено</span>
+                  <span style={styles.completedBadge}>
+                    <CheckCircle2 size={16} color="#34C759" style={{ marginRight: 4 }} /> Готово
+                  </span>
                 ) : (
-                  <button style={styles.actionBtn}>Start</button>
+                  <button style={styles.actionBtn}>
+                    Старт
+                  </button>
                 )}
               </div>
             ))}
@@ -254,26 +309,39 @@ export default function App() {
       {/* --- ЭКРАН 3: РЕЙТИНГ / ЛИДЕРБОРД --- */}
       {activeTab === "leaderboard" && (
         <div style={styles.tabContent}>
-          <h2 style={styles.pageTitle}>🏆 Топ Заработков</h2>
+          <div style={styles.headerBlock}>
+            <h1 style={styles.pageTitle}>Топ Лидеров</h1>
+            <p style={styles.pageSubtitle}>Лучшие пользователи по количеству заработка</p>
+          </div>
+
           <div style={styles.leaderList}>
             {leaderboard.map((item) => (
               <div
                 key={item.rank}
                 style={{
                   ...styles.leaderCard,
-                  border: item.first_name === user?.first_name ? "1px solid #3b82f6" : "none",
+                  border: item.first_name === user?.first_name ? "1px solid #007AFF" : "1px solid rgba(255, 255, 255, 0.05)",
+                  backgroundColor: item.first_name === user?.first_name ? "rgba(0, 122, 255, 0.08)" : "rgba(28, 28, 30, 0.65)",
                 }}
               >
                 <div style={styles.leaderRank}>
-                  {item.rank === 1 ? "🥇" : item.rank === 2 ? "🥈" : item.rank === 3 ? "🥉" : `#${item.rank}`}
+                  {item.rank === 1 ? (
+                    <span style={{ color: "#FFCC00", fontWeight: "800", fontSize: 18 }}>🥇</span>
+                  ) : item.rank === 2 ? (
+                    <span style={{ color: "#C0C0C0", fontWeight: "800", fontSize: 18 }}>🥈</span>
+                  ) : item.rank === 3 ? (
+                    <span style={{ color: "#CD7F32", fontWeight: "800", fontSize: 18 }}>🥉</span>
+                  ) : (
+                    <span style={{ color: "#8e8e93", fontSize: 14 }}>#{item.rank}</span>
+                  )}
                 </div>
                 <div style={styles.leaderDetails}>
                   <p style={styles.leaderName}>
-                    {item.first_name} {item.is_pro && "⭐"}
+                    {item.first_name} {item.is_pro && <Sparkles size={14} color="#FFCC00" style={{ marginLeft: 4, display: "inline" }} />}
                   </p>
-                  <p style={styles.leaderSub}>{item.tasks_completed} заданий</p>
+                  <p style={styles.leaderSub}>{item.tasks_completed} выполнено</p>
                 </div>
-                <div style={styles.leaderBalance}>{item.balance} coins</div>
+                <div style={styles.leaderBalance}>{item.balance?.toLocaleString()} coins</div>
               </div>
             ))}
           </div>
@@ -283,20 +351,37 @@ export default function App() {
       {/* --- ЭКРАН 4: КОШЕЛЕК И ВЫВОД --- */}
       {activeTab === "wallet" && (
         <div style={styles.tabContent}>
-          <h2 style={styles.pageTitle}>💼 Кошелек</h2>
-          <div style={styles.walletCard}>
-            <p style={{ margin: 0, opacity: 0.8 }}>Доступный баланс</p>
-            <h1 style={{ fontSize: 36, margin: "8px 0" }}>{user?.balance} coins</h1>
-            <p style={{ fontSize: 12, opacity: 0.6 }}>Минимальный вывод: 1000 coins</p>
+          <div style={styles.headerBlock}>
+            <h1 style={styles.pageTitle}>Кошелек</h1>
+            <p style={styles.pageSubtitle}>Управление вашими средствами и вывод</p>
           </div>
 
+          {/* macOS Glassmorphism Карта Баланса */}
+          <div style={styles.walletCard}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)", fontWeight: "500" }}>
+                Доступный баланс
+              </span>
+              <ShieldCheck size={20} color="#34C759" />
+            </div>
+            <h1 style={styles.walletBalanceText}>
+              {user?.balance?.toLocaleString()} <span style={{ fontSize: 20, fontWeight: "500" }}>coins</span>
+            </h1>
+            <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", margin: 0 }}>
+              Минимальный вывод: 1 000 coins
+            </p>
+          </div>
+
+          {/* iOS Form Group / Форма вывода */}
           <form style={styles.withdrawForm} onSubmit={handleWithdraw}>
-            <h3>Заявка на вывод</h3>
+            <h3 style={{ fontSize: 17, fontWeight: "600", margin: "0 0 4px 0" }}>Вывести средства</h3>
             {withdrawStatus && (
               <div
                 style={{
                   ...styles.alertMsg,
-                  backgroundColor: withdrawStatus.type === "success" ? "#166534" : "#991b1b",
+                  backgroundColor: withdrawStatus.type === "success" ? "rgba(52, 199, 89, 0.15)" : "rgba(255, 59, 48, 0.15)",
+                  color: withdrawStatus.type === "success" ? "#34C759" : "#FF3B30",
+                  border: `1px solid ${withdrawStatus.type === "success" ? "#34C759" : "#FF3B30"}`,
                 }}
               >
                 {withdrawStatus.text}
@@ -319,7 +404,10 @@ export default function App() {
               required
             />
             <button type="submit" style={styles.submitBtn}>
-              Запросить выплату
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <span>Отправить заявку</span>
+                <ArrowUpRight size={18} />
+              </div>
             </button>
           </form>
         </div>
@@ -329,9 +417,14 @@ export default function App() {
       {showRefModal && (
         <div style={styles.modalOverlay} onClick={() => setShowRefModal(false)}>
           <div style={styles.modalBody} onClick={(e) => e.stopPropagation()}>
-            <h3>👥 Партнерская программа</h3>
-            <p style={{ fontSize: 14, color: "#94a3b8" }}>
-              Приглашайте друзей и получайте **+150 coins** за каждого зарегистрированного реферала!
+            <div style={styles.modalHeader}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: "700" }}>Пригласить друзей</h3>
+              <button style={styles.closeIconBtn} onClick={() => setShowRefModal(false)}>
+                <X size={20} color="#8e8e93" />
+              </button>
+            </div>
+            <p style={{ fontSize: 14, color: "#8e8e93", lineHeight: "1.4", margin: 0 }}>
+              Получайте <strong style={{ color: "#007AFF" }}>+150 coins</strong> за каждого друга, который зайдёт в бота по вашей ссылке.
             </p>
             <div style={styles.refBox}>
               <input
@@ -340,12 +433,9 @@ export default function App() {
                 style={styles.refInput}
               />
               <button style={styles.copyBtn} onClick={copyRefLink}>
-                {copied ? "Скопировано!" : "Копировать"}
+                {copied ? <Check size={18} color="#34C759" /> : <Copy size={18} color="#007AFF" />}
               </button>
             </div>
-            <button style={styles.closeBtn} onClick={() => setShowRefModal(false)}>
-              Закрыть
-            </button>
           </div>
         </div>
       )}
@@ -354,11 +444,18 @@ export default function App() {
       {selectedTask && (
         <div style={styles.modalOverlay} onClick={() => setSelectedTask(null)}>
           <div style={styles.modalBody} onClick={(e) => e.stopPropagation()}>
-            <h3>{selectedTask.title}</h3>
-            <p style={{ color: "#94a3b8", fontSize: 14 }}>{selectedTask.description}</p>
-            <p style={{ fontSize: 18, color: "#10b981", fontWeight: "bold" }}>
-              Награда: +{selectedTask.reward} coins
+            <div style={styles.modalHeader}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: "700" }}>{selectedTask.title}</h3>
+              <button style={styles.closeIconBtn} onClick={() => setSelectedTask(null)}>
+                <X size={20} color="#8e8e93" />
+              </button>
+            </div>
+            <p style={{ color: "#8e8e93", fontSize: 14, lineHeight: "1.5", margin: 0 }}>
+              {selectedTask.description}
             </p>
+            <div style={styles.taskRewardTag}>
+              Награда: +{selectedTask.reward} coins
+            </div>
             {!selectedTask.is_completed ? (
               <button
                 style={styles.submitBtn}
@@ -367,66 +464,79 @@ export default function App() {
                 Подтвердить выполнение
               </button>
             ) : (
-              <p style={{ color: "#64748b" }}>Вы уже получили награду за это задание.</p>
+              <p style={{ color: "#34C759", textAlign: "center", fontSize: 14, fontWeight: "500", margin: 0 }}>
+                ✓ Вы уже получили награду за это задание
+              </p>
             )}
-            <button style={styles.closeBtn} onClick={() => setSelectedTask(null)}>
-              Отмена
-            </button>
           </div>
         </div>
       )}
 
-      {/* --- НАВИГАЦИОННАЯ ПАНЕЛЬ ВНИЗУ --- */}
+      {/* --- FLOATING TAB BAR (iOS / One UI Style) --- */}
       <nav style={styles.navbar}>
         <button
-          style={{ ...styles.navItem, color: activeTab === "profile" ? "#3b82f6" : "#94a3b8" }}
+          style={styles.navItem}
           onClick={() => {
             triggerHaptic();
             setActiveTab("profile");
           }}
         >
-          👤 Профиль
+          <User size={22} color={activeTab === "profile" ? "#007AFF" : "#8e8e93"} />
+          <span style={{ ...styles.navLabel, color: activeTab === "profile" ? "#007AFF" : "#8e8e93" }}>
+            Профиль
+          </span>
         </button>
+
         <button
-          style={{ ...styles.navItem, color: activeTab === "tasks" ? "#3b82f6" : "#94a3b8" }}
+          style={styles.navItem}
           onClick={() => {
             triggerHaptic();
             setActiveTab("tasks");
           }}
         >
-          🎯 Задания
+          <Target size={22} color={activeTab === "tasks" ? "#007AFF" : "#8e8e93"} />
+          <span style={{ ...styles.navLabel, color: activeTab === "tasks" ? "#007AFF" : "#8e8e93" }}>
+            Задания
+          </span>
         </button>
+
         <button
-          style={{ ...styles.navItem, color: activeTab === "leaderboard" ? "#3b82f6" : "#94a3b8" }}
+          style={styles.navItem}
           onClick={() => {
             triggerHaptic();
             setActiveTab("leaderboard");
           }}
         >
-          🏆 Лидеры
+          <Trophy size={22} color={activeTab === "leaderboard" ? "#007AFF" : "#8e8e93"} />
+          <span style={{ ...styles.navLabel, color: activeTab === "leaderboard" ? "#007AFF" : "#8e8e93" }}>
+            Лидеры
+          </span>
         </button>
+
         <button
-          style={{ ...styles.navItem, color: activeTab === "wallet" ? "#3b82f6" : "#94a3b8" }}
+          style={styles.navItem}
           onClick={() => {
             triggerHaptic();
             setActiveTab("wallet");
           }}
         >
-          💼 Кошелек
+          <Wallet size={22} color={activeTab === "wallet" ? "#007AFF" : "#8e8e93"} />
+          <span style={{ ...styles.navLabel, color: activeTab === "wallet" ? "#007AFF" : "#8e8e93" }}>
+            Кошелек
+          </span>
         </button>
       </nav>
     </div>
   );
 }
 
-// --- СТИЛИ КЛИЕНТА (DARK THEME) ---
+// --- iOS / ONE UI ДИЗАЙН-СИСТЕМА СТИЛЕЙ ---
 const styles = {
   appContainer: {
-    backgroundColor: "#0f172a",
-    color: "#f8fafc",
+    backgroundColor: "#000000",
+    color: "#f2f2f7",
     minHeight: "100vh",
-    paddingBottom: "70px",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    paddingBottom: "90px",
   },
   loadingContainer: {
     display: "flex",
@@ -434,157 +544,292 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     height: "100vh",
-    backgroundColor: "#0f172a",
-    color: "#fff",
+    backgroundColor: "#000000",
   },
   spinner: {
     width: 36,
     height: 36,
-    border: "4px solid #3b82f6",
-    borderTop: "4px solid transparent",
+    border: "3px solid rgba(0, 122, 255, 0.2)",
+    borderTop: "3px solid #007AFF",
     borderRadius: "50%",
-    animation: "spin 1s linear infinite",
+    animation: "spin 0.8s linear infinite",
   },
-  tabContent: { padding: 16 },
-  profileCard: {
-    backgroundColor: "#1e293b",
-    borderRadius: 16,
-    padding: 24,
+  tabContent: { 
+    padding: "20px 16px",
+    maxWidth: "500px",
+    margin: "0 auto",
+  },
+  headerBlock: {
+    marginBottom: 20,
+  },
+  pageTitle: { 
+    fontSize: 28, 
+    fontWeight: "800", 
+    margin: "0 0 4px 0",
+    letterSpacing: "-0.5px"
+  },
+  pageSubtitle: {
+    fontSize: 14,
+    color: "#8e8e93",
+    margin: 0,
+  },
+
+  /* iOS Profile Widget */
+  profileWidget: {
+    background: "rgba(28, 28, 30, 0.65)",
+    backdropFilter: "blur(20px)",
+    WebkitBackdropFilter: "blur(20px)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "28px",
+    padding: "28px 20px",
     textAlign: "center",
     marginBottom: 16,
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
   },
-  avatar: { fontSize: 40, marginBottom: 8 },
-  userName: { margin: "0 0 4px 0", fontSize: 20 },
-  userHandle: { margin: 0, color: "#64748b", fontSize: 14 },
-  balanceBadge: {
-    display: "inline-block",
-    backgroundColor: "#334155",
-    padding: "8px 16px",
-    borderRadius: 20,
-    marginTop: 12,
+  avatarWrapper: {
+    width: 72,
+    height: 72,
+    borderRadius: "50%",
+    backgroundColor: "rgba(0, 122, 255, 0.12)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 12px auto",
+    border: "1px solid rgba(0, 122, 255, 0.3)",
+  },
+  userName: { 
+    margin: "0 0 2px 0", 
+    fontSize: 22, 
+    fontWeight: "700",
+    letterSpacing: "-0.3px"
+  },
+  userHandle: { 
+    margin: 0, 
+    color: "#8e8e93", 
     fontSize: 14,
+    fontWeight: "400"
   },
-  balanceText: { color: "#3b82f6", fontWeight: "bold", fontSize: 22 },
+  balanceBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 122, 255, 0.1)",
+    border: "1px solid rgba(0, 122, 255, 0.25)",
+    padding: "8px 18px",
+    borderRadius: "30px",
+    marginTop: 16,
+  },
+  balanceText: { 
+    color: "#007AFF", 
+    fontWeight: "800", 
+    fontSize: 20,
+    letterSpacing: "-0.5px"
+  },
+  coinsLabel: {
+    color: "#007AFF",
+    fontSize: 13,
+    marginLeft: 5,
+    fontWeight: "600",
+  },
+
+  /* iOS Grid Widgets */
   statsGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr",
-    gap: 8,
+    gap: 10,
     marginBottom: 16,
   },
   statCard: {
-    backgroundColor: "#1e293b",
-    borderRadius: 12,
-    padding: 12,
-    textAlign: "center",
-    cursor: "pointer",
-    transition: "transform 0.1s",
-    border: "1px solid #334155",
-  },
-  statTitle: { fontSize: 12, color: "#94a3b8", display: "block" },
-  statValue: { fontSize: 18, fontWeight: "bold", margin: "4px 0", display: "block" },
-  statHint: { fontSize: 9, color: "#3b82f6", display: "block" },
-  proButton: {
-    width: "100%",
-    backgroundColor: "#d97706",
-    color: "#fff",
-    border: "none",
-    padding: 14,
-    borderRadius: 12,
-    fontWeight: "bold",
-    fontSize: 14,
+    background: "rgba(28, 28, 30, 0.65)",
+    backdropFilter: "blur(20px)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "20px",
+    padding: "14px 12px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
     cursor: "pointer",
   },
-  pageTitle: { fontSize: 22, margin: "0 0 16px 0" },
-  categoriesRow: { display: "flex", gap: 8, overflowX: "auto", marginBottom: 16 },
-  catChip: {
-    backgroundColor: "#1e293b",
-    color: "#94a3b8",
-    border: "none",
-    padding: "8px 14px",
-    borderRadius: 20,
-    fontSize: 13,
-    whiteSpace: "nowrap",
-    cursor: "pointer",
-  },
-  catChipActive: { backgroundColor: "#3b82f6", color: "#fff" },
-  tasksList: { display: "flex", flexDirection: "column", gap: 10 },
-  taskCard: {
-    backgroundColor: "#1e293b",
-    borderRadius: 12,
-    padding: 14,
+  statHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    cursor: "pointer",
+    marginBottom: 12,
   },
-  taskInfo: { flex: 1 },
-  taskTitle: { margin: "0 0 4px 0", fontSize: 15 },
-  taskReward: { margin: 0, color: "#10b981", fontSize: 13, fontWeight: "bold" },
-  completedBadge: { color: "#64748b", fontSize: 12 },
-  actionBtn: {
-    backgroundColor: "#3b82f6",
+  statValue: { 
+    fontSize: 20, 
+    fontWeight: "700", 
+    letterSpacing: "-0.5px",
+    marginBottom: 2,
+    display: "block" 
+  },
+  statTitle: { 
+    fontSize: 12, 
+    color: "#8e8e93", 
+    fontWeight: "500",
+    display: "block" 
+  },
+
+  /* PRO Banner */
+  proButton: {
+    width: "100%",
+    background: "linear-gradient(135deg, #FF9500 0%, #FF2D55 100%)",
     color: "#fff",
     border: "none",
-    padding: "6px 16px",
-    borderRadius: 8,
-    fontSize: 13,
+    padding: "16px 20px",
+    borderRadius: "22px",
     cursor: "pointer",
-  },
-  leaderList: { display: "flex", flexDirection: "column", gap: 8 },
-  leaderCard: {
-    backgroundColor: "#1e293b",
-    borderRadius: 12,
-    padding: 12,
     display: "flex",
     alignItems: "center",
-    gap: 12,
+    justifyContent: "space-between",
+    boxShadow: "0 8px 25px rgba(255, 149, 0, 0.25)",
   },
-  leaderRank: { width: 30, textAlign: "center", fontSize: 16, fontWeight: "bold" },
+
+  /* Segmented Categories */
+  categoriesRow: { 
+    display: "flex", 
+    gap: 8, 
+    overflowX: "auto", 
+    marginBottom: 18,
+    paddingBottom: 4,
+  },
+  catChip: {
+    backgroundColor: "rgba(118, 118, 128, 0.18)",
+    color: "#8e8e93",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "30px",
+    fontSize: 14,
+    fontWeight: "600",
+    whiteSpace: "nowrap",
+    cursor: "pointer",
+  },
+  catChipActive: { 
+    backgroundColor: "#007AFF", 
+    color: "#fff" 
+  },
+
+  /* Task Cards */
+  tasksList: { 
+    display: "flex", 
+    flexDirection: "column", 
+    gap: 10 
+  },
+  taskCard: {
+    background: "rgba(28, 28, 30, 0.65)",
+    backdropFilter: "blur(20px)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "20px",
+    padding: "16px",
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    cursor: "pointer",
+  },
+  taskIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: "14px",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  taskInfo: { flex: 1 },
+  taskTitle: { margin: "0 0 2px 0", fontSize: 15, fontWeight: "600" },
+  taskReward: { margin: 0, color: "#34C759", fontSize: 13, fontWeight: "700" },
+  completedBadge: { 
+    color: "#34C759", 
+    fontSize: 13, 
+    fontWeight: "600",
+    display: "flex",
+    alignItems: "center"
+  },
+  actionBtn: {
+    backgroundColor: "rgba(0, 122, 255, 0.15)",
+    color: "#007AFF",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "30px",
+    fontSize: 13,
+    fontWeight: "700",
+    cursor: "pointer",
+  },
+
+  /* Leaderboard */
+  leaderList: { display: "flex", flexDirection: "column", gap: 10 },
+  leaderCard: {
+    borderRadius: "20px",
+    padding: "14px 16px",
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    backdropFilter: "blur(20px)",
+  },
+  leaderRank: { width: 32, textAlign: "center" },
   leaderDetails: { flex: 1 },
-  leaderName: { margin: 0, fontSize: 14, fontWeight: "bold" },
-  leaderSub: { margin: 0, fontSize: 12, color: "#64748b" },
-  leaderBalance: { color: "#3b82f6", fontWeight: "bold" },
+  leaderName: { margin: "0 0 2px 0", fontSize: 15, fontWeight: "600" },
+  leaderSub: { margin: 0, fontSize: 12, color: "#8e8e93" },
+  leaderBalance: { color: "#007AFF", fontWeight: "700", fontSize: 14 },
+
+  /* Wallet Card (macOS Glass) */
   walletCard: {
-    backgroundColor: "#1e293b",
-    borderRadius: 16,
-    padding: 20,
-    textAlign: "center",
+    background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%)",
+    backdropFilter: "blur(30px)",
+    border: "1px solid rgba(255, 255, 255, 0.15)",
+    borderRadius: "28px",
+    padding: "24px",
     marginBottom: 20,
+    boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
   },
+  walletBalanceText: { 
+    fontSize: 34, 
+    fontWeight: "800", 
+    margin: "12px 0 6px 0",
+    letterSpacing: "-1px"
+  },
+
+  /* Forms & Inputs */
   withdrawForm: {
-    backgroundColor: "#1e293b",
-    borderRadius: 16,
-    padding: 16,
+    background: "rgba(28, 28, 30, 0.65)",
+    backdropFilter: "blur(20px)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "24px",
+    padding: "20px",
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: 14,
   },
   inputField: {
-    backgroundColor: "#0f172a",
-    border: "1px solid #334155",
+    backgroundColor: "rgba(118, 118, 128, 0.12)",
+    border: "1px solid rgba(255, 255, 255, 0.05)",
     color: "#fff",
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 14,
+    padding: "14px 16px",
+    borderRadius: "16px",
+    fontSize: 15,
+    outline: "none",
   },
   submitBtn: {
-    backgroundColor: "#10b981",
+    backgroundColor: "#007AFF",
     color: "#fff",
     border: "none",
-    padding: 14,
-    borderRadius: 8,
-    fontWeight: "bold",
+    padding: "16px",
+    borderRadius: "16px",
+    fontWeight: "700",
+    fontSize: 15,
     cursor: "pointer",
     width: "100%",
   },
-  alertMsg: { padding: 10, borderRadius: 8, fontSize: 13, color: "#fff" },
+  alertMsg: { padding: "12px 14px", borderRadius: "14px", fontSize: 13, fontWeight: "500" },
+
+  /* Modals */
   modalOverlay: {
     position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.8)",
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    backdropFilter: "blur(10px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -592,58 +837,95 @@ const styles = {
     zIndex: 1000,
   },
   modalBody: {
-    backgroundColor: "#1e293b",
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: "#1c1c1e",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "28px",
+    padding: "24px",
     width: "100%",
-    maxWidth: 400,
+    maxWidth: 380,
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: 16,
+  },
+  modalHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  closeIconBtn: {
+    background: "rgba(255, 255, 255, 0.08)",
+    border: "none",
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
   },
   refBox: { display: "flex", gap: 8 },
   refInput: {
     flex: 1,
-    backgroundColor: "#0f172a",
-    border: "1px solid #334155",
-    color: "#fff",
-    padding: 8,
-    borderRadius: 8,
-    fontSize: 12,
+    backgroundColor: "rgba(118, 118, 128, 0.12)",
+    border: "none",
+    color: "#8e8e93",
+    padding: "12px 14px",
+    borderRadius: "14px",
+    fontSize: 13,
+    outline: "none",
   },
   copyBtn: {
-    backgroundColor: "#3b82f6",
-    color: "#fff",
+    backgroundColor: "rgba(0, 122, 255, 0.15)",
     border: "none",
-    padding: "8px 12px",
-    borderRadius: 8,
+    padding: "0 16px",
+    borderRadius: "14px",
     cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  closeBtn: {
-    backgroundColor: "transparent",
-    color: "#64748b",
-    border: "none",
-    padding: 8,
-    cursor: "pointer",
+  taskRewardTag: {
+    backgroundColor: "rgba(52, 199, 89, 0.12)",
+    color: "#34C759",
+    padding: "10px 14px",
+    borderRadius: "14px",
+    fontWeight: "700",
+    fontSize: 15,
+    textAlign: "center",
   },
+
+  /* Floating Bottom Navigation (iOS Style) */
   navbar: {
     position: "fixed",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: "#1e293b",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    maxWidth: 460,
+    margin: "0 auto",
+    height: "64px",
+    backgroundColor: "rgba(28, 28, 30, 0.75)",
+    backdropFilter: "blur(25px)",
+    WebkitBackdropFilter: "blur(25px)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "36px",
     display: "flex",
     justifyContent: "space-around",
     alignItems: "center",
-    borderTop: "1px solid #334155",
     zIndex: 100,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
   },
   navItem: {
     background: "none",
     border: "none",
-    fontSize: 12,
-    fontWeight: "bold",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 3,
     cursor: "pointer",
+    padding: "6px 12px",
+  },
+  navLabel: {
+    fontSize: 10,
+    fontWeight: "600",
   },
 };
