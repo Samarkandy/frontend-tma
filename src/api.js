@@ -1,37 +1,39 @@
-const API_BASE_URL = "https://tg-web-app-ozk0.onrender.com";
+// Единственный API-клиент проекта. Раньше существовало три разных файла
+// (api.js, api/client.js, api/index.js) с разными наборами функций и разными
+// способами передавать initData — реально использовался только api.js (через App.jsx),
+// два других были мёртвым кодом. Теперь он один, и адрес бэкенда берётся из
+// переменной окружения VITE_API_URL (задайте её в Render для фронтенда),
+// с тем же адресом что и раньше — как запасной вариант.
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://tg-web-app-ozk0.onrender.com";
 
 export const apiRequest = async (endpoint, options = {}) => {
   const tg = window.Telegram?.WebApp;
-  
-  if (tg) {
-    tg.ready();
-  }
+  if (tg) tg.ready();
 
   const initData = tg?.initData || "";
 
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${initData}`,
+    Authorization: `Bearer ${initData}`,
     ...options.headers,
   };
 
+  let response;
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.detail || "Ошибка сервера");
-    }
-
-    return data;
+    response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
   } catch (err) {
-    if (err.name === "TypeError") {
-      throw new Error("Ошибка сети или CORS.");
-    }
-    throw err;
+    throw new Error("Ошибка сети — проверьте подключение и попробуйте снова.", { cause: err });
   }
+
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    // тело могло быть пустым — не критично
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.detail || `Ошибка сервера (${response.status})`);
+  }
+  return data;
 };

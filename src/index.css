@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f5f5f4;
+  --color-card: #ffffff;
+  --color-ink: #1c1917;
+  --color-ink-soft: #57534e;
+  --color-ink-faint: #a8a29e;
+  --color-line: #e7e5e4;
+  --color-stamp: #4338ca;
+  --color-stamp-deep: #312e81;
+  --color-stamp-soft: #eef2ff;
+  --color-coin: #b45309;
+  --color-go: #059669;
+  --color-go-soft: #ecfdf5;
+  --color-warn: #b91c1c;
+  --color-warn-soft: #fef2f2;
+  --font-display: "Fraunces", ui-serif, serif;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--color-paper);
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
